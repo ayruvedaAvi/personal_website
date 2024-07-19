@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../utils/colors.dart';
 import '../widgets/custom_appbar.dart';
+import 'projects_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,7 +12,8 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   List<Dot> dots = [];
   late AnimationController _controller;
   Offset? mousePosition;
@@ -19,8 +21,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 1))
-      ..repeat();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 1))
+          ..repeat();
     for (int i = 0; i < 100; i++) {
       dots.add(Dot());
     }
@@ -57,7 +60,99 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               },
             ),
           ),
-          CustomAppbar(),
+          Center(
+            child: Column(
+              children: [
+                CustomAppbar(),
+                const SizedBox(height: 50),
+                Column(
+                  //crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Hello, I'm",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.white, width: 2,),
+                        gradient: const LinearGradient(colors: [
+                          Color.fromARGB(180, 6, 120, 97),
+                          Color.fromARGB(180, 123, 10, 114),
+                        ]),
+                      ),
+                      child: const IntrinsicWidth(
+                        stepWidth: 100,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Abhishek",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 50,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              "Neupane",
+                              style: TextStyle(
+                                  color: Colors.blueGrey,
+                                  fontSize: 50,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              "👋",
+                              style: TextStyle(
+                                fontSize: 50,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 50),
+                    const Text(
+                      "I'm a Flutter and laravel developer.",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "I love to build beautiful and user-friendly applications.",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 50),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const ProjectsScreen()));
+                      },
+                      child: const Text(
+                        "Browse my projects",
+                        style: TextStyle(
+                          color: Colors.lightBlue,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
