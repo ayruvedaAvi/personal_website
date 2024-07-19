@@ -71,16 +71,20 @@ class _HomeScreenState extends State<HomeScreen>
                     const Text(
                       "Hello, I'm",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: grey,
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    const SizedBox(height: 20),
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.white, width: 2,),
+                        border: Border.all(
+                          color: grey,
+                          width: 2,
+                        ),
                         gradient: const LinearGradient(colors: [
                           Color.fromARGB(180, 6, 120, 97),
                           Color.fromARGB(180, 123, 10, 114),
@@ -112,6 +116,7 @@ class _HomeScreenState extends State<HomeScreen>
                               "👋",
                               style: TextStyle(
                                 fontSize: 50,
+                                color: Colors.yellow,
                               ),
                             ),
                           ],
@@ -122,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen>
                     const Text(
                       "I'm a Flutter and laravel developer.",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: grey,
                         fontSize: 20,
                       ),
                     ),
@@ -130,15 +135,18 @@ class _HomeScreenState extends State<HomeScreen>
                     const Text(
                       "I love to build beautiful and user-friendly applications.",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: grey,
                         fontSize: 20,
                       ),
                     ),
                     const SizedBox(height: 50),
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const ProjectsScreen()));
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const ProjectsScreen(),
+                          ),
+                        );
                       },
                       child: const Text(
                         "Browse my projects",
