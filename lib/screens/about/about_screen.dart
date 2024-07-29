@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:personal_website/screens/about/components/social_links.dart';
 
 import '../../components/custom_appbar.dart';
 import '../../core/constants/fonts.dart';
@@ -86,6 +87,8 @@ class _AboutScreenState extends State<AboutScreen>
                 const ProfileSection(),
                 const SizedBox(height: 20),
                 const InfoGrid(),
+                const SizedBox(height: 30),
+                const SocialLinks(),
               ],
             ),
           ),
