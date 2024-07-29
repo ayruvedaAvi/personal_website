@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-import '../../utils/colors.dart';
-import '../../widgets/custom_appbar.dart';
+import '../../core/constants/colors.dart';
+import '../../components/custom_appbar.dart';
 import '../projects/projects_screen.dart';
 
 class HomeScreen extends StatefulWidget {

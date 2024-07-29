@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/colors.dart';
-import '../../widgets/custom_appbar.dart';
+import '../../core/constants/colors.dart';
+import '../../components/custom_appbar.dart';
 
 class ProjectsScreen extends StatelessWidget {
   const ProjectsScreen({super.key});

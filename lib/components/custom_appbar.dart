@@ -34,7 +34,7 @@ class CustomAppbar extends StatelessWidget {
           const SizedBox(width: 20),
           NavigationButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => AboutScreen()));
             },
             selectedPage: "About",
             isSelected: selectedPage == "About" ? true : false,
