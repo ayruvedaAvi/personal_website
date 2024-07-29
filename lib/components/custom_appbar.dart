@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../screens/about_screen.dart';
-import '../screens/contact_screen.dart';
-import '../screens/home_screen.dart';
-import '../screens/projects_screen.dart';
+import '../screens/about/about_screen.dart';
+import '../screens/contact/contact_screen.dart';
+import '../screens/home/home_screen.dart';
+import '../screens/projects/projects_screen.dart';
 import 'nav_component.dart';
 
 // ignore: must_be_immutable

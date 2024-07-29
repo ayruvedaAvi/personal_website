@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-import '../utils/colors.dart';
-import '../widgets/custom_appbar.dart';
-import 'projects_screen.dart';
+import '../../utils/colors.dart';
+import '../../widgets/custom_appbar.dart';
+import '../projects/projects_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
