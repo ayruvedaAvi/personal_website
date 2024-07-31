@@ -14,6 +14,20 @@ class ProjectsScreen extends StatefulWidget {
 class _ProjectsScreenState extends State<ProjectsScreen> {
   String text = "Projects Screen";
 
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.requestFocus();
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
   upPressed() {
     setState(() {
       text = "Up Pressed";
@@ -44,38 +58,38 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       backgroundColor: baseColor,
       body: SafeArea(
           child: KeyboardListener(
-            focusNode: FocusNode(),
-            onKeyEvent: (value) {
-              if (value.logicalKey == LogicalKeyboardKey.arrowUp) {
-                setState(() {
-                  text = "Up Pressed";
-                });
-                upPressed();
-              } else if (value.logicalKey == LogicalKeyboardKey.arrowDown) {
-                downPressed();
-              } else if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
-                leftPressed();
-              } else if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
-                rightPressed();
-              }
-            },
-            child: Stack(
-              children: [
-                Center(
-                  child: Text(
-                    text,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-                Controls(
-                  downPressed: downPressed,
-                  leftPressed: leftPressed,
-                  rightPressed: rightPressed,
-                  upPressed: upPressed,
-                ),
-              ],
+        focusNode: _focusNode,
+        onKeyEvent: (value) {
+          if (value.logicalKey == LogicalKeyboardKey.arrowUp) {
+            setState(() {
+              text = "Up Pressed";
+            });
+            upPressed();
+          } else if (value.logicalKey == LogicalKeyboardKey.arrowDown) {
+            downPressed();
+          } else if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
+            leftPressed();
+          } else if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
+            rightPressed();
+          }
+        },
+        child: Stack(
+          children: [
+            Center(
+              child: Text(
+                "Pojects section is still under construction $text",
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
-          )),
+            Controls(
+              downPressed: downPressed,
+              leftPressed: leftPressed,
+              rightPressed: rightPressed,
+              upPressed: upPressed,
+            ),
+          ],
+        ),
+      )),
     );
   }
 }

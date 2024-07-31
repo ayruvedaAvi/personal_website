@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../screens/about/about_screen.dart';
-import '../screens/contact/contact_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/projects/projects_screen.dart';
 import 'nav_component.dart';
@@ -46,14 +45,6 @@ class CustomAppbar extends StatelessWidget {
             },
             selectedPage: "Projects",
             isSelected: selectedPage == "Projects" ? true : false,
-          ),
-          const SizedBox(width: 20),
-          NavigationButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactScreen()));
-            },
-            selectedPage: "Contact",
-            isSelected: selectedPage == "Contact" ? true : false,
           ),
         ],
       ),
