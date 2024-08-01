@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/constants/colors.dart';
 import 'components/controls.dart';
+import 'components/snake.dart';
 
 class ProjectsScreen extends StatefulWidget {
   const ProjectsScreen({super.key});
@@ -11,45 +12,78 @@ class ProjectsScreen extends StatefulWidget {
   State<ProjectsScreen> createState() => _ProjectsScreenState();
 }
 
-class _ProjectsScreenState extends State<ProjectsScreen> {
+class _ProjectsScreenState extends State<ProjectsScreen> with SingleTickerProviderStateMixin {
   String text = "Projects Screen";
-
   final FocusNode _focusNode = FocusNode();
+  double _snakePosition = 0;
+  bool _isMoving = false;
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
     _focusNode.requestFocus();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 16), // ~60 FPS
+    )..addListener(_updateSnakePosition);
   }
 
   @override
   void dispose() {
     _focusNode.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
-  upPressed() {
+  void _updateSnakePosition() {
+    if (_isMoving) {
+      setState(() {
+        _snakePosition += 2; // Adjust this value to change speed
+        if (_snakePosition > MediaQuery.of(context).size.width) {
+          _snakePosition = -100; // Reset position when off-screen
+        }
+      });
+    }
+  }
+
+  void _startMoving() {
+    if (!_isMoving) {
+      _isMoving = true;
+      _animationController.repeat();
+    }
+  }
+
+  void _stopMoving() {
+    if (_isMoving) {
+      _isMoving = false;
+      _animationController.stop();
+    }
+  }
+
+  void _upPressed() {
     setState(() {
       text = "Up Pressed";
     });
   }
 
-  void downPressed() {
+  void _downPressed() {
     setState(() {
       text = "Down Pressed";
     });
   }
 
-  void leftPressed() {
+  void _leftPressed() {
     setState(() {
       text = "Left Pressed";
     });
   }
 
-  void rightPressed() {
+  void _rightPressed() {
     setState(() {
       text = "Right Pressed";
     });
+    _startMoving();
   }
 
   @override
@@ -61,16 +95,19 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         focusNode: _focusNode,
         onKeyEvent: (value) {
           if (value.logicalKey == LogicalKeyboardKey.arrowUp) {
-            setState(() {
-              text = "Up Pressed";
-            });
-            upPressed();
+            _upPressed();
           } else if (value.logicalKey == LogicalKeyboardKey.arrowDown) {
-            downPressed();
+            _downPressed();
           } else if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
-            leftPressed();
+            _leftPressed();
           } else if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
-            rightPressed();
+            _rightPressed();
+          } else if (value.logicalKey == LogicalKeyboardKey.space) {
+            if(_isMoving) {
+              _stopMoving();
+            } else {
+              _startMoving();
+            }
           }
         },
         child: Stack(
@@ -82,11 +119,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               ),
             ),
             Controls(
-              downPressed: downPressed,
-              leftPressed: leftPressed,
-              rightPressed: rightPressed,
-              upPressed: upPressed,
+              downPressed: _downPressed,
+              leftPressed: _leftPressed,
+              rightPressed: _rightPressed,
+              upPressed: _upPressed,
             ),
+            Snake(xPosition: _snakePosition),
           ],
         ),
       )),
