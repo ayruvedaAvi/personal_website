@@ -32,7 +32,7 @@ class Controls extends StatelessWidget {
         children: [
           const SizedBox(height: 20),
           Text(
-            "You can also use arrow keys to move and space to start/stop",
+            "You can also use arrow keys to move and space to stop",
             style: TextStyle(
               color: Colors.lightBlue,
               fontSize: 10,

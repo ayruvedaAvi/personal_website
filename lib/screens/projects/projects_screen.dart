@@ -12,11 +12,14 @@ class ProjectsScreen extends StatefulWidget {
   State<ProjectsScreen> createState() => _ProjectsScreenState();
 }
 
-class _ProjectsScreenState extends State<ProjectsScreen> with SingleTickerProviderStateMixin {
+class _ProjectsScreenState extends State<ProjectsScreen>
+    with SingleTickerProviderStateMixin {
   String text = "Projects Screen";
   final FocusNode _focusNode = FocusNode();
-  double _snakePosition = 0;
-  bool _isMoving = false;
+  double _snakeXPosition = 90;
+  double _snakeYPosition = 0;
+  bool _isMovingHorizontally = false;
+  bool _isMovingVertically = false;
   late AnimationController _animationController;
 
   @override
@@ -37,53 +40,70 @@ class _ProjectsScreenState extends State<ProjectsScreen> with SingleTickerProvid
   }
 
   void _updateSnakePosition() {
-    if (_isMoving) {
-      setState(() {
-        _snakePosition += 2; // Adjust this value to change speed
-        if (_snakePosition > MediaQuery.of(context).size.width) {
-          _snakePosition = -100; // Reset position when off-screen
+    setState(() {
+      if (_isMovingHorizontally) {
+        _snakeXPosition += 2;
+        if (_snakeXPosition > MediaQuery.of(context).size.width) {
+          _snakeXPosition = -100;
         }
-      });
+      }
+      if (_isMovingVertically) {
+        _snakeYPosition += 2;
+        if (_snakeYPosition > MediaQuery.of(context).size.height) {
+          _snakeYPosition = -100;
+        }
+      }
+    });
+  }
+
+  void _startMovingHorizontally() {
+    if (!_isMovingHorizontally) {
+      _isMovingHorizontally = true;
+      _isMovingVertically = false;
+      _animationController.repeat();
     }
   }
 
-  void _startMoving() {
-    if (!_isMoving) {
-      _isMoving = true;
+  void _startMovingVertically() {
+    if (!_isMovingVertically) {
+      _isMovingVertically = true;
+      _isMovingHorizontally = false;
       _animationController.repeat();
     }
   }
 
   void _stopMoving() {
-    if (_isMoving) {
-      _isMoving = false;
-      _animationController.stop();
-    }
+    _isMovingHorizontally = false;
+    _isMovingVertically = false;
+    _animationController.stop();
   }
 
   void _upPressed() {
     setState(() {
       text = "Up Pressed";
     });
+    _snakeYPosition -= 10;
   }
 
   void _downPressed() {
     setState(() {
       text = "Down Pressed";
     });
+    _startMovingVertically();
   }
 
   void _leftPressed() {
     setState(() {
       text = "Left Pressed";
     });
+    _snakeXPosition -= 10;
   }
 
   void _rightPressed() {
     setState(() {
       text = "Right Pressed";
     });
-    _startMoving();
+    _startMovingHorizontally();
   }
 
   @override
@@ -91,43 +111,40 @@ class _ProjectsScreenState extends State<ProjectsScreen> with SingleTickerProvid
     return Scaffold(
       backgroundColor: baseColor,
       body: SafeArea(
-          child: KeyboardListener(
-        focusNode: _focusNode,
-        onKeyEvent: (value) {
-          if (value.logicalKey == LogicalKeyboardKey.arrowUp) {
-            _upPressed();
-          } else if (value.logicalKey == LogicalKeyboardKey.arrowDown) {
-            _downPressed();
-          } else if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
-            _leftPressed();
-          } else if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
-            _rightPressed();
-          } else if (value.logicalKey == LogicalKeyboardKey.space) {
-            if(_isMoving) {
+        child: KeyboardListener(
+          focusNode: _focusNode,
+          onKeyEvent: (value) {
+            if (value.logicalKey == LogicalKeyboardKey.arrowUp) {
+              _upPressed();
+            } else if (value.logicalKey == LogicalKeyboardKey.arrowDown) {
+              _downPressed();
+            } else if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
+              _leftPressed();
+            } else if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
+              _rightPressed();
+            } else if (value.logicalKey == LogicalKeyboardKey.space) {
               _stopMoving();
-            } else {
-              _startMoving();
             }
-          }
-        },
-        child: Stack(
-          children: [
-            Center(
-              child: Text(
-                "Pojects section is still under construction $text",
-                style: const TextStyle(color: Colors.white),
+          },
+          child: Stack(
+            children: [
+              Center(
+                child: Text(
+                  "Projects section is still under construction $text",
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
-            ),
-            Controls(
-              downPressed: _downPressed,
-              leftPressed: _leftPressed,
-              rightPressed: _rightPressed,
-              upPressed: _upPressed,
-            ),
-            Snake(xPosition: _snakePosition),
-          ],
+              Controls(
+                downPressed: _downPressed,
+                leftPressed: _leftPressed,
+                rightPressed: _rightPressed,
+                upPressed: _upPressed,
+              ),
+              Snake(xPosition: _snakeXPosition, yPosition: _snakeYPosition),
+            ],
+          ),
         ),
-      )),
+      ),
     );
   }
 }
