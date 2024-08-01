@@ -3,6 +3,7 @@ import 'package:personal_website/screens/about/components/social_links.dart';
 
 import '../../components/custom_appbar.dart';
 import '../../core/constants/fonts.dart';
+import 'components/contact_links.dart';
 import 'components/info_grid.dart';
 import 'components/profile_section.dart';
 
@@ -87,8 +88,33 @@ class _AboutScreenState extends State<AboutScreen>
                 const ProfileSection(),
                 const SizedBox(height: 20),
                 const InfoGrid(),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  height: 20,
+                  child: const Text(
+                    "Reach me: ",
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                ),
                 const SocialLinks(),
+                const SizedBox(height: 30),
+                const ContactLinks(),
+                const SizedBox(height: 20),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  height: 20,
+                  child: const Text(
+                    "© 2024 Abhishek Neupane",
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                ),
               ],
             ),
           ),
