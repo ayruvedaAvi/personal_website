@@ -16,7 +16,21 @@ class _ProjectsScreenState extends State<ProjectsScreen>
     with SingleTickerProviderStateMixin {
   String text = "Projects Screen";
   final FocusNode _focusNode = FocusNode();
-  double _snakeXPosition = 90;
+  double _box1xPosition = 0;
+  double _box1yPosition = 0;
+  double _box2xPosition = 0;
+  double _box2yPosition = 0;
+  double _box3xPosition = 0;
+  double _box3yPosition = 0;
+  double _box4xPosition = 0;
+  double _box4yPosition = 0;
+  double _box5xPosition = 0;
+  double _box5yPosition = 0;
+  double _box6xPosition = 0;
+  double _box6yPosition = 0;
+  double _turnXPosition = 0;
+  double _turnYPosition = 0;
+  double _snakeXPosition = 0;
   double _snakeYPosition = 0;
   bool _isMovingHorizontally = false;
   bool _isMovingVertically = false;
@@ -39,16 +53,56 @@ class _ProjectsScreenState extends State<ProjectsScreen>
     super.dispose();
   }
 
+  void _calculateSnakePosition() {
+    if (_isMovingHorizontally) {
+      if (_snakeXPosition > _turnXPosition) {
+        _box1xPosition = _snakeXPosition;
+        _box1yPosition = _snakeYPosition;
+        _box2xPosition = _snakeXPosition - 20;
+        _box2yPosition = _snakeYPosition;
+        _box3xPosition = _snakeXPosition - 40;
+        _box3yPosition = _snakeYPosition;
+        _box4xPosition = _snakeXPosition - 60;
+        _box4yPosition = _snakeYPosition;
+        _box5xPosition = _snakeXPosition - 80;
+        _box5yPosition = _snakeYPosition;
+        _box6xPosition = _snakeXPosition - 100;
+        _box6yPosition = _snakeYPosition;
+      } else {
+        _box1xPosition = _snakeXPosition;
+        _box1yPosition = _snakeYPosition;
+        _box2xPosition = _snakeXPosition + 20;
+        _box2yPosition = _snakeYPosition;
+        _box3xPosition = _snakeXPosition + 40;
+        _box3yPosition = _snakeYPosition;
+        _box4xPosition = _snakeXPosition + 60;
+        _box4yPosition = _snakeYPosition;
+        _box5xPosition = _snakeXPosition + 80;
+        _box5yPosition = _snakeYPosition;
+        _box6xPosition = _snakeXPosition + 100;
+        _box6yPosition = _snakeYPosition;
+      }
+    }
+  }
+
   void _updateSnakePosition() {
+
+    // flag 1 = right
+    // flag 2 = left
+    // flag 3 = up
+    // flag 4 = down
+
     setState(() {
       if (_isMovingHorizontally) {
-        _snakeXPosition += 2;
+         _snakeXPosition += 2;
+         _calculateSnakePosition();
         if (_snakeXPosition > MediaQuery.of(context).size.width) {
           _snakeXPosition = -100;
         }
       }
       if (_isMovingVertically) {
         _snakeYPosition += 2;
+        _calculateSnakePosition();
         if (_snakeYPosition > MediaQuery.of(context).size.height) {
           _snakeYPosition = -100;
         }
@@ -140,7 +194,20 @@ class _ProjectsScreenState extends State<ProjectsScreen>
                 rightPressed: _rightPressed,
                 upPressed: _upPressed,
               ),
-              Snake(xPosition: _snakeXPosition, yPosition: _snakeYPosition),
+              Snake(
+                box1xPosition: _box1xPosition,
+                box1yPosition: _box1yPosition,
+                box2xPosition: _box2xPosition,
+                box2yPosition: _box2yPosition,
+                box3xPosition: _box3xPosition,
+                box3yPosition: _box3yPosition,
+                box4xPosition: _box4xPosition,
+                box4yPosition: _box4yPosition,
+                box5xPosition: _box5xPosition,
+                box5yPosition: _box5yPosition,
+                box6xPosition: _box6xPosition,
+                box6yPosition: _box6yPosition,
+              ),
             ],
           ),
         ),
