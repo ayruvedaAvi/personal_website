@@ -1,3 +1,6 @@
+// comments are in mixed language (Nepali and English) as this is a personal project
+// this was initially made with 3 months of work experience in flutter
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,6 +19,8 @@ class _ProjectsScreenState extends State<ProjectsScreen>
     with SingleTickerProviderStateMixin {
   String text = "Projects Screen";
   final FocusNode _focusNode = FocusNode();
+
+  // boxes x ra y position (1 bhanya head and likewise)
   double _box1xPosition = 0;
   double _box1yPosition = 0;
   double _box2xPosition = 0;
@@ -28,12 +33,25 @@ class _ProjectsScreenState extends State<ProjectsScreen>
   double _box5yPosition = 0;
   double _box6xPosition = 0;
   double _box6yPosition = 0;
+
+  // while button pressed tauko ko position store garna ko lagi
   double _turnXPosition = 0;
   double _turnYPosition = 0;
+
+  // actual animation le move garne snake ko position
   double _snakeXPosition = 0;
   double _snakeYPosition = 0;
+
+  // to know if the snake is moving horizontally or vertically
   bool _isMovingHorizontally = false;
   bool _isMovingVertically = false;
+
+  // snake turn garda chaiine flags
+  bool _isTurning = false;
+  int _turnDirection = 0;
+
+  // rajesh dai ho yo animation controller
+  // this shii is the khalnayak of this project
   late AnimationController _animationController;
 
   @override
@@ -42,7 +60,7 @@ class _ProjectsScreenState extends State<ProjectsScreen>
     _focusNode.requestFocus();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 16), // ~60 FPS
+      duration: const Duration(milliseconds: 16), // AI said this is equivalent to 60fps lol
     )..addListener(_updateSnakePosition);
   }
 
@@ -54,43 +72,86 @@ class _ProjectsScreenState extends State<ProjectsScreen>
   }
 
   void _calculateSnakePosition() {
-    if (_isMovingHorizontally) {
-      if (_snakeXPosition > _turnXPosition) {
-        _box1xPosition = _snakeXPosition;
-        _box1yPosition = _snakeYPosition;
-        _box2xPosition = _snakeXPosition - 20;
-        _box2yPosition = _snakeYPosition;
-        _box3xPosition = _snakeXPosition - 40;
-        _box3yPosition = _snakeYPosition;
-        _box4xPosition = _snakeXPosition - 60;
-        _box4yPosition = _snakeYPosition;
-        _box5xPosition = _snakeXPosition - 80;
-        _box5yPosition = _snakeYPosition;
-        _box6xPosition = _snakeXPosition - 100;
-        _box6yPosition = _snakeYPosition;
-      } else {
-        _box1xPosition = _snakeXPosition;
-        _box1yPosition = _snakeYPosition;
-        _box2xPosition = _snakeXPosition + 20;
-        _box2yPosition = _snakeYPosition;
-        _box3xPosition = _snakeXPosition + 40;
-        _box3yPosition = _snakeYPosition;
-        _box4xPosition = _snakeXPosition + 60;
-        _box4yPosition = _snakeYPosition;
-        _box5xPosition = _snakeXPosition + 80;
-        _box5yPosition = _snakeYPosition;
-        _box6xPosition = _snakeXPosition + 100;
-        _box6yPosition = _snakeYPosition;
+    if (_isTurning) {
+      _handleTurning();
+    } else if (_isMovingHorizontally){
+      _handleHorizontalMovement();
+    } else if (_isMovingVertically) {
+      _handleVerticalMovement();
+    }
+  }
+
+  void _handleTurning() {
+    if (_turnDirection == 1) {
+      _snakeYPosition -= 2;
+      if (_snakeYPosition <= _turnYPosition) {
+        _snakeYPosition = _turnYPosition;
+        _isTurning = false;
+        _isMovingHorizontally = true;
+        _isMovingVertically = false;
+      }
+    } else if (_turnDirection == 2) {
+      _snakeYPosition += 2;
+      if (_snakeYPosition >= _turnYPosition) {
+        _snakeYPosition = _turnYPosition;
+        _isTurning = false;
+        _isMovingHorizontally = true;
+        _isMovingVertically = false;
+      }
+    } else if (_turnDirection == 3) {
+      _snakeXPosition -= 2;
+      if (_snakeXPosition <= _turnXPosition) {
+        _snakeXPosition = _turnXPosition;
+        _isTurning = false;
+        _isMovingHorizontally = false;
+        _isMovingVertically = true;
+      }
+    } else if (_turnDirection == 4) {
+      _snakeXPosition += 2;
+      if (_snakeXPosition >= _turnXPosition) {
+        _snakeXPosition = _turnXPosition;
+        _isTurning = false;
+        _isMovingHorizontally = false;
+        _isMovingVertically = true;
       }
     }
   }
 
-  void _updateSnakePosition() {
+  void _handleHorizontalMovement() {
+    if (_snakeXPosition >= _box1xPosition) {
+      _box6xPosition = _box5xPosition;
+      _box6yPosition = _box5yPosition;
+      _box5xPosition = _box4xPosition;
+      _box5yPosition = _box4yPosition;
+      _box4xPosition = _box3xPosition;
+      _box4yPosition = _box3yPosition;
+      _box3xPosition = _box2xPosition;
+      _box3yPosition = _box2yPosition;
+      _box2xPosition = _box1xPosition;
+      _box2yPosition = _box1yPosition;
+      _box1xPosition = _snakeXPosition;
+      _box1yPosition = _snakeYPosition;
+    }
+  }
 
-    // flag 1 = right
-    // flag 2 = left
-    // flag 3 = up
-    // flag 4 = down
+  void _handleVerticalMovement() {
+    if (_snakeYPosition >= _box1yPosition) {
+      _box6xPosition = _box5xPosition;
+      _box6yPosition = _box5yPosition;
+      _box5xPosition = _box4xPosition;
+      _box5yPosition = _box4yPosition;
+      _box4xPosition = _box3xPosition;
+      _box4yPosition = _box3yPosition;
+      _box3xPosition = _box2xPosition;
+      _box3yPosition = _box2yPosition;
+      _box2xPosition = _box1xPosition;
+      _box2yPosition = _box1yPosition;
+      _box1xPosition = _snakeXPosition;
+      _box1yPosition = _snakeYPosition;
+    }
+  }
+
+  void _updateSnakePosition() {
 
     setState(() {
       if (_isMovingHorizontally) {
