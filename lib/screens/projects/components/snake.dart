@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class Snake extends StatelessWidget {
@@ -26,82 +28,40 @@ class Snake extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: [
-        Positioned(
-          left: boxXPositions[5],
-          top: boxYPositions[5],
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            width: 20,
-            height: 20,
-          ),
-        ),
-        Positioned(
-          left: boxXPositions[4],
-          top: boxYPositions[4],
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              color: Colors.green,
-            ),
-            width: 20,
-            height: 20,
-          ),
-        ),
-        Positioned(
-          left: boxXPositions[3],
-          top:  boxYPositions[3],
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              color: Colors.green,
-            ),
-            width: 20,
-            height: 20,
-          ),
-        ),
-        Positioned(
-          left: boxXPositions[2],
-          top: boxYPositions[2],
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            width: 20,
-            height: 20,
-          ),
-        ),
-        Positioned(
-          left: boxXPositions[1],
-          top: boxYPositions[1],
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            width: 20,
-            height: 20,
-          ),
-        ),
-        Positioned(
-          left: boxXPositions[0],
-          top: boxYPositions[0],
-          child: Container(
-            width: 20,
-            height: 20,
-            color: Colors.transparent,
-            child: const Icon(
-              Icons.donut_small_outlined,
-              color: Colors.green,
-              size: 20,
+      children: List.generate(boxXPositions.length, (index) {
+        return Positioned(
+          left: boxXPositions[index],
+          top: boxYPositions[index],
+          child: Transform.rotate(
+            angle: _calculateRotationAngle(index),
+            child: Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: index == 0 ? Colors.red : Colors.green,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: index == 0
+                  ? const Icon(
+                      Icons.donut_small_outlined,
+                      color: Colors.white,
+                      size: 20,
+                    )
+                  : null,
             ),
           ),
-        ),
-      ],
+        );
+      }),
     );
+  }
+
+  // helper function to calculate angle for bending
+  double _calculateRotationAngle(int index) {
+    if (index == 0) return 0.0; // head has no rotation
+
+    // calculate the angle between current and previous positions
+    double dx = boxXPositions[index - 1] - boxXPositions[index];
+    double dy = boxYPositions[index - 1] - boxYPositions[index];
+    return atan2(dy, dx);
   }
 }

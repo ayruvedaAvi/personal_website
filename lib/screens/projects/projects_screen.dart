@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/constants/colors.dart';
 import 'components/controls.dart';
-// import 'components/snake.dart';
+import 'components/snake.dart';
 
 class ProjectsScreen extends StatefulWidget {
   const ProjectsScreen({super.key});
@@ -20,8 +20,8 @@ class _ProjectsScreenState extends State<ProjectsScreen>
   String text = "Projects Screen";
   final FocusNode _focusNode = FocusNode();
 
-  List<double> _boxXPositions = List.filled(6, 0);
-  List<double> _boxYPositions = List.filled(6, 0);
+  final List<double> _boxXPositions = List.filled(6, 0);
+  final List<double> _boxYPositions = List.filled(6, 0);
 
   // while button pressed tauko ko position store garna ko lagi
   double _turnXPosition = 0;
@@ -45,7 +45,7 @@ class _ProjectsScreenState extends State<ProjectsScreen>
 
   // New variables for snake movement
   int _currentDirection = 1; // 1: right, 2: left, 3: up, 4: down
-  double _speed = 2.0;
+  final double _speed = 2.0;
   bool _isPaused = false;
 
   @override
@@ -60,7 +60,7 @@ class _ProjectsScreenState extends State<ProjectsScreen>
     // Initialize snake position
     _snakeXPosition = 100;
     _snakeYPosition = 100;
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < _boxXPositions.length; i++) {
       _boxXPositions[i] = _snakeXPosition - i * 20;
       _boxYPositions[i] = _snakeYPosition;
     }
@@ -122,6 +122,12 @@ class _ProjectsScreenState extends State<ProjectsScreen>
   }
 
   void _moveSnake() {
+    // Move the body
+    for (int i = _boxXPositions.length - 1; i > 0; i--) {
+      _boxXPositions[i] = _boxXPositions[i - 1];
+      _boxYPositions[i] = _boxYPositions[i - 1];
+    }
+
     // Move the head
     switch (_currentDirection) {
       case 1: // right
@@ -141,12 +147,6 @@ class _ProjectsScreenState extends State<ProjectsScreen>
     // Update head position
     _boxXPositions[0] = _snakeXPosition;
     _boxYPositions[0] = _snakeYPosition;
-
-    // Update body positions
-    for (int i = 5; i > 0; i--) {
-      _boxXPositions[i] = _boxXPositions[i - 1];
-      _boxYPositions[i] = _boxYPositions[i - 1];
-    }
 
     // Wrap around screen
     _wrapAroundScreen();
@@ -273,44 +273,6 @@ class _ProjectsScreenState extends State<ProjectsScreen>
           ),
         ),
       ),
-    );
-  }
-}
-
-class Snake extends StatelessWidget {
-  final List<double> boxXPositions;
-  final List<double> boxYPositions;
-
-  const Snake({
-    super.key,
-    required this.boxXPositions,
-    required this.boxYPositions,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: List.generate(6, (index) {
-        return Positioned(
-          left: boxXPositions[index],
-          top: boxYPositions[index],
-          child: Container(
-            width: 20,
-            height: 20,
-            decoration: BoxDecoration(
-              color: index == 0 ? Colors.red : Colors.green,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: index == 0
-                ? const Icon(
-                    Icons.donut_small_outlined,
-                    color: Colors.white,
-                    size: 20,
-                  )
-                : null,
-          ),
-        );
-      }),
     );
   }
 }
