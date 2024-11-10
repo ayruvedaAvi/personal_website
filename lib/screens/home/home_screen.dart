@@ -1,234 +1,308 @@
-import 'dart:math';
+import 'dart:ui';
 import 'package:flutter/material.dart';
-
-import '../../core/constants/colors.dart';
-import '../../components/custom_appbar.dart';
-import '../projects/projects_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
   @override
-  // ignore: library_private_types_in_public_api
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
-  List<Dot> dots = [];
-  late AnimationController _controller;
-  Offset? mousePosition;
-
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  late final AnimationController _leftCircleController;
+  late final AnimationController _rightCircleController;
+  
   @override
   void initState() {
     super.initState();
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1))
-          ..repeat();
-    for (int i = 0; i < 100; i++) {
-      dots.add(Dot());
-    }
+    _leftCircleController = AnimationController(
+      duration: const Duration(seconds: 4),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    _rightCircleController = AnimationController(
+      duration: const Duration(seconds: 4),
+      vsync: this,
+    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _leftCircleController.dispose();
+    _rightCircleController.dispose();
     super.dispose();
   }
 
+  final List<Widget> _navButtons = [
+    _NavButton(text: 'HOME'),
+    _NavButton(text: 'ABOUT'),
+    _NavButton(text: 'PROJECTS'),
+    _NavButton(text: 'CONTACT'),
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+
     return Scaffold(
-      backgroundColor: baseColor,
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Text('Abhishek', style: GoogleFonts.delius()),
+        ),
+        backgroundColor: Colors.black,
+        actions: [
+          ..._navButtons,
+          const SizedBox(width: 20),
+        ],
+      ),
       body: Stack(
         children: [
-          MouseRegion(
-            onHover: (event) {
-              setState(() {
-                mousePosition = event.position;
-              });
-            },
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                for (var dot in dots) {
-                  dot.move(context, mousePosition);
-                }
-                return CustomPaint(
-                  painter: DotsPainter(dots),
-                  size: Size.infinite,
-                );
-              },
-            ),
+          // Animated circles
+          _buildAnimatedCircle(
+            controller: _leftCircleController,
+            color: Colors.greenAccent,
+            screenWidth: screenWidth,
+            isLeft: true,
           ),
-          Center(
-            child: Column(
-              children: [
-                CustomAppbar(),
-                const SizedBox(height: 50),
-                Column(
-                  //crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Hello, I'm",
-                      style: TextStyle(
-                        color: grey,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: grey,
-                          width: 2,
-                        ),
-                        gradient: const LinearGradient(colors: [
-                          Color.fromARGB(180, 6, 120, 97),
-                          Color.fromARGB(180, 123, 10, 114),
-                        ]),
-                      ),
-                      child: const IntrinsicWidth(
-                        stepWidth: 100,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Abhishek",
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 50,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              "Neupane",
-                              style: TextStyle(
-                                  color: Colors.blueGrey,
-                                  fontSize: 50,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              "👋",
-                              style: TextStyle(
-                                fontSize: 50,
-                                color: Colors.yellow,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 50),
-                    const Text(
-                      "I'm a Flutter and laravel developer.",
-                      style: TextStyle(
-                        color: grey,
-                        fontSize: 20,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      "I love to build beautiful and user-friendly applications.",
-                      style: TextStyle(
-                        color: grey,
-                        fontSize: 20,
-                      ),
-                    ),
-                    const SizedBox(height: 50),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const ProjectsScreen(),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        "Browse my projects",
-                        style: TextStyle(
-                          color: Colors.lightBlue,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+          _buildAnimatedCircle(
+            controller: _rightCircleController,
+            color: Colors.redAccent,
+            screenWidth: screenWidth,
+            isLeft: false,
+          ),
+          // Backdrop blur
+          const Positioned.fill(
+            child: _BackdropBlur(),
+          ),
+          // Main content
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _MainContent(isMobile: isMobile, screenWidth: screenWidth),
           ),
         ],
       ),
     );
   }
-}
 
-class Dot {
-  late double x, y;
-  late Color color;
-  late double speedX, speedY;
-  late double size;
+  Widget _buildAnimatedCircle({
+    required AnimationController controller,
+    required Color color,
+    required double screenWidth,
+    required bool isLeft,
+  }) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        final double position = isLeft
+            ? Tween<double>(begin: -200, end: 200)
+                .animate(CurvedAnimation(
+                  parent: controller,
+                  curve: Curves.easeInOut,
+                ))
+                .value
+            : Tween<double>(
+                begin: screenWidth + 200,
+                end: screenWidth - 200,
+              )
+                .animate(CurvedAnimation(
+                  parent: controller,
+                  curve: Curves.easeInOut,
+                ))
+                .value;
 
-  Dot() {
-    Random random = Random();
-    x = random.nextDouble() * 1000;
-    y = random.nextDouble() * 1000;
-    color = Color.fromRGBO(
-      random.nextInt(256),
-      random.nextInt(256),
-      random.nextInt(256),
-      1,
+        return Positioned(
+          left: position,
+          bottom: -30,
+          child: child!,
+        );
+      },
+      child: ImageFiltered(
+        imageFilter: ImageFilter.blur(sigmaX: 120, sigmaY: 80),
+        child: Container(
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+          width: 250,
+          height: 250,
+        ),
+      ),
     );
-    speedX = (random.nextDouble() - 0.5) * 2;
-    speedY = (random.nextDouble() - 0.5) * 2;
-    size = 3 + random.nextDouble() * 5;
-  }
-
-  void move(BuildContext context, Offset? mousePosition) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
-    x += speedX;
-    y += speedY;
-
-    if (mousePosition != null) {
-      double dx = mousePosition.dx - x;
-      double dy = mousePosition.dy - y;
-      double distance = sqrt(dx * dx + dy * dy);
-      if (distance < 100) {
-        x -= dx / distance * 2;
-        y -= dy / distance * 2;
-      }
-    }
-
-    if (x < 0 || x > screenWidth) speedX *= -1;
-    if (y < 0 || y > screenHeight) speedY *= -1;
-
-    x = x.clamp(0, screenWidth);
-    y = y.clamp(0, screenHeight);
   }
 }
 
-class DotsPainter extends CustomPainter {
-  final List<Dot> dots;
+class _NavButton extends StatelessWidget {
+  final String text;
 
-  DotsPainter(this.dots);
+  const _NavButton({required this.text});
 
   @override
-  void paint(Canvas canvas, Size size) {
-    for (var dot in dots) {
-      canvas.drawCircle(
-        Offset(dot.x, dot.y),
-        dot.size,
-        Paint()..color = dot.color,
-      );
-    }
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () {},
+      child: Text(text, style: const TextStyle(color: Colors.white)),
+    );
+  }
+}
+
+class _BackdropBlur extends StatelessWidget {
+  const _BackdropBlur();
+
+  @override
+  Widget build(BuildContext context) {
+    return ImageFiltered(
+      imageFilter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+      child: Container(
+        color: Colors.black.withOpacity(0.3),
+      ),
+    );
+  }
+}
+
+class _MainContent extends StatelessWidget {
+  final bool isMobile;
+  final double screenWidth;
+
+  const _MainContent({
+    required this.isMobile,
+    required this.screenWidth,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: isMobile
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: _buildContentItems(),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: _buildContentItems(),
+                ),
+        ),
+      ],
+    );
   }
 
+  List<Widget> _buildContentItems() {
+    return [
+      Expanded(
+        flex: isMobile ? 1 : 2,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 24),
+          child: _IntroSection(isMobile: isMobile),
+        ),
+      ),
+      if (!isMobile)
+        Expanded(
+          flex: 3,
+          child: _ImageSection(
+            isMobile: isMobile,
+            screenWidth: screenWidth,
+          ),
+        ),
+      Expanded(
+        flex: isMobile ? 1 : 4,
+        child: _HeadlineSection(isMobile: isMobile),
+      ),
+    ];
+  }
+}
+
+class _IntroSection extends StatelessWidget {
+  final bool isMobile;
+
+  const _IntroSection({required this.isMobile});
+
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment:
+          isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Blending my passion for Flutter development and mountain biking,\n"
+          "I'm driven to create dynamic, responsive apps that perform\n"
+          "smoothly on any terrain. Just like on the trails, I navigate\n"
+          "the challenges of coding with agility and persistence.",
+          style: GoogleFonts.hiMelody(
+            color: Colors.white70,
+            fontSize: 20,
+          ),
+          textAlign: isMobile ? TextAlign.center : TextAlign.start,
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.black,
+            backgroundColor: Colors.white,
+          ),
+          child: const Text("LET'S CONTACT"),
+        ),
+      ],
+    );
+  }
+}
+
+class _ImageSection extends StatelessWidget {
+  final bool isMobile;
+  final double screenWidth;
+
+  const _ImageSection({
+    required this.isMobile,
+    required this.screenWidth,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: AlignmentDirectional.bottomCenter,
+      child: Container(
+        width: isMobile ? screenWidth * 0.8 : 500,
+        height: isMobile ? screenWidth * 0.8 : 500,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('images/mtb.png'),
+            fit: BoxFit.fill,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HeadlineSection extends StatelessWidget {
+  final bool isMobile;
+
+  const _HeadlineSection({required this.isMobile});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: isMobile
+          ? const EdgeInsets.symmetric(vertical: 20)
+          : const EdgeInsets.only(right: 40),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerRight,
+        child: Text(
+          "Driven by \nDESIGN, \nFocus on \nFUNCTIONALITY",
+          textAlign: TextAlign.right,
+          style: GoogleFonts.hiMelody(
+            color: Colors.white,
+            fontSize: isMobile ? 30 : 70,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
 }

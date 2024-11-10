@@ -28,8 +28,8 @@ class _AboutScreenState extends State<AboutScreen>
     Colors.teal,
   ];
   int index = 0;
-  Color bottomColor = const Color.fromARGB(255, 5, 84, 127);
-  Color topColor = const Color.fromARGB(255, 119, 1, 91);
+  Color bottomColor = const Color.fromARGB(255, 170, 219, 246);
+  Color topColor = const Color.fromARGB(255, 243, 93, 208);
   Alignment begin = Alignment.topLeft;
   Alignment end = Alignment.bottomRight;
 
@@ -69,7 +69,7 @@ class _AboutScreenState extends State<AboutScreen>
         automaticallyImplyLeading: false,
       ),
       body: AnimatedContainer(
-        duration: const Duration(seconds: 5),
+        duration: const Duration(seconds: 3),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: begin,
