@@ -2,6 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../about/about_screen.dart';
+import '../projects/projects_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -12,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late final AnimationController _leftCircleController;
   late final AnimationController _rightCircleController;
-  
+
   @override
   void initState() {
     super.initState();
@@ -20,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       duration: const Duration(seconds: 4),
       vsync: this,
     )..repeat(reverse: true);
-    
+
     _rightCircleController = AnimationController(
       duration: const Duration(seconds: 4),
       vsync: this,
@@ -35,10 +38,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   final List<Widget> _navButtons = [
-    _NavButton(text: 'HOME'),
-    _NavButton(text: 'ABOUT'),
-    _NavButton(text: 'PROJECTS'),
-    _NavButton(text: 'CONTACT'),
+    const _NavButton(text: 'HOME', screen: HomeScreen()),
+    const _NavButton(
+      text: 'PROJECTS',
+      screen: ProjectsScreen(),
+    ),
+    const _NavButton(text: 'CONTACT', screen: AboutScreen()),
   ];
 
   @override
@@ -98,19 +103,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       animation: controller,
       builder: (context, child) {
         final double position = isLeft
-            ? Tween<double>(begin: -200, end: 200)
+            ? Tween<double>(begin: -100, end: screenWidth)
                 .animate(CurvedAnimation(
                   parent: controller,
-                  curve: Curves.easeInOut,
+                  curve: Curves.slowMiddle,
                 ))
                 .value
             : Tween<double>(
-                begin: screenWidth + 200,
-                end: screenWidth - 200,
+                begin: screenWidth + 100,
+                end: screenWidth - screenWidth + 100,
               )
                 .animate(CurvedAnimation(
                   parent: controller,
-                  curve: Curves.easeInOut,
+                  curve: Curves.slowMiddle,
                 ))
                 .value;
 
@@ -137,13 +142,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
 class _NavButton extends StatelessWidget {
   final String text;
+  final Widget screen;
 
-  const _NavButton({required this.text});
+  const _NavButton({required this.text, required this.screen});
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: () {},
+      onPressed: () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => screen));
+      },
       child: Text(text, style: const TextStyle(color: Colors.white)),
     );
   }

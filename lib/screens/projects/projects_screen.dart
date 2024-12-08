@@ -54,7 +54,8 @@ class _ProjectsScreenState extends State<ProjectsScreen>
     _focusNode.requestFocus();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 16), // AI said this is equivalent to 60fps lol
+      duration: const Duration(
+          milliseconds: 16), // AI said this is equivalent to 60fps lol
     )..addListener(_updateSnakePosition);
 
     // Initialize snake position
@@ -177,9 +178,9 @@ class _ProjectsScreenState extends State<ProjectsScreen>
 
   void _changeDirection(int newDirection) {
     if ((_currentDirection == 1 || _currentDirection == 2) &&
-        (newDirection == 3 || newDirection == 4) ||
+            (newDirection == 3 || newDirection == 4) ||
         (_currentDirection == 3 || _currentDirection == 4) &&
-        (newDirection == 1 || newDirection == 2)) {
+            (newDirection == 1 || newDirection == 2)) {
       if (!_isTurning) {
         _turnDirection = newDirection;
         _turnXPosition = _snakeXPosition;
@@ -251,26 +252,51 @@ class _ProjectsScreenState extends State<ProjectsScreen>
               }
             }
           },
-          child: Stack(
-            children: [
-              Center(
-                child: Text(
-                  "Projects section is still under construction $text",
-                  style: const TextStyle(color: Colors.white),
+          child: GestureDetector(
+            onDoubleTap: _isPaused ? _resumeMoving : _stopMoving,
+            onVerticalDragEnd: (details) {
+              if (details.velocity.pixelsPerSecond.dy < 0) {
+                _upPressed();
+              } else {
+                _downPressed();
+              }
+            },
+            onHorizontalDragDown: (details) {
+              if (details.localPosition.dx < _snakeXPosition) {
+                _leftPressed();
+              } else {
+                _rightPressed();
+              }
+            },
+            child: Stack(
+              children: [
+                _generateProjects(title: text),
+                Controls(
+                  downPressed: _downPressed,
+                  leftPressed: _leftPressed,
+                  rightPressed: _rightPressed,
+                  upPressed: _upPressed,
                 ),
-              ),
-              Controls(
-                downPressed: _downPressed,
-                leftPressed: _leftPressed,
-                rightPressed: _rightPressed,
-                upPressed: _upPressed,
-              ),
-              Snake(
-                boxXPositions: _boxXPositions,
-                boxYPositions: _boxYPositions,
-              ),
-            ],
+                Snake(
+                  boxXPositions: _boxXPositions,
+                  boxYPositions: _boxYPositions,
+                ),
+              ],
+            ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _generateProjects({required String title}) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 24,
         ),
       ),
     );
