@@ -1,6 +1,8 @@
 // comments are in mixed language (Nepali and English) as this is a personal project
 // this was initially made with 3 months of work experience in flutter
+// ignore_for_file: unused_field
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -15,48 +17,27 @@ class ProjectsScreen extends StatefulWidget {
   State<ProjectsScreen> createState() => _ProjectsScreenState();
 }
 
-class _ProjectsScreenState extends State<ProjectsScreen>
-    with SingleTickerProviderStateMixin {
+class _ProjectsScreenState extends State<ProjectsScreen> {
   String text = "Projects Screen";
   final FocusNode _focusNode = FocusNode();
 
   final List<double> _boxXPositions = List.filled(6, 0);
   final List<double> _boxYPositions = List.filled(6, 0);
 
-  // while button pressed tauko ko position store garna ko lagi
-  double _turnXPosition = 0;
-  double _turnYPosition = 0;
-
-  // actual animation le move garne snake ko position
   double _snakeXPosition = 0;
   double _snakeYPosition = 0;
 
-  // to know if the snake is moving horizontally or vertically
   bool _isMovingHorizontally = false;
-  bool _isMovingVertically = false;
-
-  // snake turn garda chaiine flags
-  bool _isTurning = false;
-  int _turnDirection = 0;
-
-  // rajesh dai ho yo animation controller
-  // this shii is the khalnayak of this project
-  late AnimationController _animationController;
-
-  // New variables for snake movement
+  final bool _isMovingVertically = false;
+  
+  Timer? _movementTimer;
   int _currentDirection = 1; // 1: right, 2: left, 3: up, 4: down
-  final double _speed = 2.0;
   bool _isPaused = false;
 
   @override
   void initState() {
     super.initState();
     _focusNode.requestFocus();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(
-          milliseconds: 16), // AI said this is equivalent to 60fps lol
-    )..addListener(_updateSnakePosition);
 
     // Initialize snake position
     _snakeXPosition = 100;
@@ -66,129 +47,105 @@ class _ProjectsScreenState extends State<ProjectsScreen>
       _boxYPositions[i] = _snakeYPosition;
     }
     _isMovingHorizontally = true;
-    _animationController.repeat();
+
+    // Start the snake's movement
+    _startMovement();
   }
 
   @override
   void dispose() {
     _focusNode.dispose();
-    _animationController.dispose();
+    _movementTimer?.cancel(); // Clean up the timer
     super.dispose();
   }
 
-  void _calculateSnakePosition() {
-    if (_isTurning) {
-      _handleTurning();
-    } else {
-      _moveSnake();
-    }
-  }
-
-  void _handleTurning() {
-    double distanceToTurn = 20;
-    bool allBoxesTurned = true;
-
-    for (int i = 0; i < 6; i++) {
-      double boxX = _boxXPositions[i];
-      double boxY = _boxYPositions[i];
-
-      if (_turnDirection == 1 || _turnDirection == 2) {
-        if ((boxX - _turnXPosition).abs() > 1) {
-          _boxXPositions[i] += (boxX < _turnXPosition) ? _speed : -_speed;
-          allBoxesTurned = false;
-        } else {
-          _boxXPositions[i] = _turnXPosition;
-          _boxYPositions[i] = _turnYPosition +
-              i * distanceToTurn * (_turnDirection == 1 ? 1 : -1);
+  void _startMovement() {
+    _movementTimer?.cancel();
+    _movementTimer = Timer.periodic(
+      const Duration(milliseconds: 200),
+      (timer) {
+        if (!_isPaused) {
+          setState(() {
+            _moveSnake();
+          });
         }
-      } else {
-        if ((boxY - _turnYPosition).abs() > 1) {
-          _boxYPositions[i] += (boxY < _turnYPosition) ? _speed : -_speed;
-          allBoxesTurned = false;
-        } else {
-          _boxYPositions[i] = _turnYPosition;
-          _boxXPositions[i] = _turnXPosition +
-              i * distanceToTurn * (_turnDirection == 3 ? -1 : 1);
-        }
-      }
-    }
-
-    if (allBoxesTurned) {
-      _isTurning = false;
-      _isMovingHorizontally = _turnDirection == 1 || _turnDirection == 2;
-      _isMovingVertically = _turnDirection == 3 || _turnDirection == 4;
-      _currentDirection = _turnDirection;
-      _turnDirection = 0;
-    }
+      },
+    );
   }
 
   void _moveSnake() {
-    // Move the body
+    // Move the body segments (from tail to head)
     for (int i = _boxXPositions.length - 1; i > 0; i--) {
       _boxXPositions[i] = _boxXPositions[i - 1];
       _boxYPositions[i] = _boxYPositions[i - 1];
     }
 
-    // Move the head
+    // Move the head based on current direction
     switch (_currentDirection) {
       case 1: // right
-        _snakeXPosition += _speed;
+        _boxXPositions[0] += 20;
         break;
       case 2: // left
-        _snakeXPosition -= _speed;
+        _boxXPositions[0] -= 20;
         break;
       case 3: // up
-        _snakeYPosition -= _speed;
+        _boxYPositions[0] -= 20;
         break;
       case 4: // down
-        _snakeYPosition += _speed;
+        _boxYPositions[0] += 20;
         break;
     }
 
-    // Update head position
-    _boxXPositions[0] = _snakeXPosition;
-    _boxYPositions[0] = _snakeYPosition;
-
     // Wrap around screen
     _wrapAroundScreen();
+  }
+
+  void _changeDirection(int newDirection) {
+    // Prevent 180-degree turns
+    bool isValidTurn = (_currentDirection == 1 && newDirection == 2) ||
+        (_currentDirection == 2 && newDirection == 1) ||
+        (_currentDirection == 3 && newDirection == 4) ||
+        (_currentDirection == 4 && newDirection == 3);
+
+    // Ignore if it's an invalid turn
+    if (isValidTurn) return;
+
+    // Only change direction if not currently turning
+    _currentDirection = newDirection;
   }
 
   void _wrapAroundScreen() {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    if (_snakeXPosition < -20) {
-      _snakeXPosition = screenWidth;
-    } else if (_snakeXPosition > screenWidth) {
-      _snakeXPosition = -20;
+    // Wrap X position
+    if (_boxXPositions[0] < 0) {
+      _boxXPositions[0] = screenWidth;
+    } else if (_boxXPositions[0] > screenWidth) {
+      _boxXPositions[0] = 0;
     }
 
-    if (_snakeYPosition < -20) {
-      _snakeYPosition = screenHeight;
-    } else if (_snakeYPosition > screenHeight) {
-      _snakeYPosition = -20;
+    // Wrap Y position
+    if (_boxYPositions[0] < 0) {
+      _boxYPositions[0] = screenHeight;
+    } else if (_boxYPositions[0] > screenHeight) {
+      _boxYPositions[0] = 0;
     }
   }
 
-  void _updateSnakePosition() {
-    setState(() {
-      _calculateSnakePosition();
-    });
-  }
-
-  void _changeDirection(int newDirection) {
-    if ((_currentDirection == 1 || _currentDirection == 2) &&
-            (newDirection == 3 || newDirection == 4) ||
-        (_currentDirection == 3 || _currentDirection == 4) &&
-            (newDirection == 1 || newDirection == 2)) {
-      if (!_isTurning) {
-        _turnDirection = newDirection;
-        _turnXPosition = _snakeXPosition;
-        _turnYPosition = _snakeYPosition;
-        _isTurning = true;
-      }
-    }
-  }
+  // void _changeDirection(int newDirection) {
+  //   if ((_currentDirection == 1 || _currentDirection == 2) &&
+  //           (newDirection == 3 || newDirection == 4) ||
+  //       (_currentDirection == 3 || _currentDirection == 4) &&
+  //           (newDirection == 1 || newDirection == 2)) {
+  //     if (!_isTurning) {
+  //       _turnDirection = newDirection;
+  //       _turnXPosition = _snakeXPosition;
+  //       _turnYPosition = _snakeYPosition;
+  //       _isTurning = true;
+  //     }
+  //   }
+  // }
 
   void _upPressed() {
     setState(() {
@@ -220,12 +177,10 @@ class _ProjectsScreenState extends State<ProjectsScreen>
 
   void _stopMoving() {
     _isPaused = true;
-    _animationController.stop();
   }
 
   void _resumeMoving() {
     _isPaused = false;
-    _animationController.repeat();
   }
 
   @override
