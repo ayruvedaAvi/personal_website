@@ -29,7 +29,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   bool _isMovingHorizontally = false;
   final bool _isMovingVertically = false;
-  
+
   Timer? _movementTimer;
   int _currentDirection = 1; // 1: right, 2: left, 3: up, 4: down
   bool _isPaused = false;
@@ -187,40 +187,40 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: baseColor,
-      body: SafeArea(
-        child: KeyboardListener(
-          focusNode: _focusNode,
-          onKeyEvent: (value) {
-            if (value.logicalKey == LogicalKeyboardKey.arrowUp) {
-              _upPressed();
-            } else if (value.logicalKey == LogicalKeyboardKey.arrowDown) {
-              _downPressed();
-            } else if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
-              _leftPressed();
-            } else if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
-              _rightPressed();
-            } else if (value.logicalKey == LogicalKeyboardKey.space) {
-              if (_isPaused) {
-                _resumeMoving();
-              } else {
-                _stopMoving();
-              }
-            }
-          },
-          child: GestureDetector(
-            onDoubleTap: _isPaused ? _resumeMoving : _stopMoving,
-            onVerticalDragEnd: (details) {
-              if (details.velocity.pixelsPerSecond.dy < 0) {
+      body: GestureDetector(
+        onDoubleTap: _isPaused ? _resumeMoving : _stopMoving,
+        onVerticalDragEnd: (details) {
+          if (details.velocity.pixelsPerSecond.dy < 0) {
+            _upPressed();
+          } else {
+            _downPressed();
+          }
+        },
+        onHorizontalDragDown: (details) {
+          if (details.localPosition.dx < _snakeXPosition) {
+            _rightPressed();
+          } else {
+            _leftPressed();
+          }
+        },
+        child: SafeArea(
+          child: KeyboardListener(
+            focusNode: _focusNode,
+            onKeyEvent: (value) {
+              if (value.logicalKey == LogicalKeyboardKey.arrowUp) {
                 _upPressed();
-              } else {
+              } else if (value.logicalKey == LogicalKeyboardKey.arrowDown) {
                 _downPressed();
-              }
-            },
-            onHorizontalDragDown: (details) {
-              if (details.localPosition.dx < _snakeXPosition) {
+              } else if (value.logicalKey == LogicalKeyboardKey.arrowLeft) {
                 _leftPressed();
-              } else {
+              } else if (value.logicalKey == LogicalKeyboardKey.arrowRight) {
                 _rightPressed();
+              } else if (value.logicalKey == LogicalKeyboardKey.space) {
+                if (_isPaused) {
+                  _resumeMoving();
+                } else {
+                  _stopMoving();
+                }
               }
             },
             child: Stack(
@@ -247,11 +247,17 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget _generateProjects({required String title}) {
     return Align(
       alignment: Alignment.topCenter,
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 24,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
         ),
       ),
     );
